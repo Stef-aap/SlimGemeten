@@ -34,20 +34,3 @@ jobs:
       run: |
         pyinstaller --onefile main.py
 
-    - name: Upload executable
-      uses: actions/upload-artifact@v4
-      with:
-        name: SlimGemeten-${{ matrix.os }}
-        path: |
-          dist/main
-          dist/main.exe
-        retention-days: 90  # maximaal 90 dagen
-
-    - name: Create Release
-      uses: softprops/action-gh-release@v2
-      if: github.ref == 'refs/heads/main'
-      with:
-        tag_name: latest
-        files: |
-          dist/main
-          dist/main.exe
