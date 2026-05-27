@@ -7,8 +7,11 @@ on:
     branches: [ "main" ]
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # ← deze regel toegevoegd
-  
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: write        # ← dit is nodig voor releases
+
 jobs:
   build:
     strategy:
@@ -34,20 +37,17 @@ jobs:
       run: |
         pyinstaller --onefile main.py
 
-    - name: Upload executable
-      uses: actions/upload-artifact@v4
-      with:
-        name: SlimGemeten-${{ matrix.os }}
-        path: |
-          dist/main
-          dist/main.exe
-        retention-days: 90  # maximaal 90 dagen
-
-    - name: Create Release
+    - name: Upload Release (Linux/macOS)
       uses: softprops/action-gh-release@v2
-      if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/main' && matrix.os != 'windows-latest'
       with:
         tag_name: latest
-        files: |
-          dist/main
-          dist/main.exe
+        files: dist/main
+
+    - name: Upload Release (Windows)
+      uses: softprops/action-gh-release@v2
+      if: github.ref == 'refs/heads/main' && matrix.os == 'windows-latest'
+      with:
+        tag_name: latest
+        files: dist/main.exe
+
